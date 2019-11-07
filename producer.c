@@ -4,8 +4,10 @@
 
 int main()
 {
-
-    sendS();
+    char alfabeto[] = "abcdefghijklmnopqrstuvwxyz";
     
+    sendS(alfabeto);
+    // sendA(alfabeto);
+
     return 0;
 }
