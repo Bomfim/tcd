@@ -52,5 +52,5 @@ Mkfile.old
 dkms.conf
 
 .vscode
-client
-server
+producer
+consumer

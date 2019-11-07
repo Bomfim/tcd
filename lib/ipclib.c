@@ -1,9 +1,13 @@
 #include <sys/types.h>
 #include <sys/ipc.h>
 #include <sys/shm.h>
+#include <sys/mman.h>
+#include <sys/stat.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <semaphore.h>
+#include <fcntl.h>
 #include "ipclib.h"
 
 void die(char *s)
@@ -27,14 +31,20 @@ void sendS()
     if ((shm = shmat(shmid, NULL, 0)) == (char *)-1)
         die("shmat");
 
-    /*
-     *      * Put some things into the memory for the
-     *        other process to read.
-     *        */
+    sem_t *semptr = sem_open("semaphore", /* name */
+                             O_CREAT,     /* create the semaphore */
+                             0644,        /* protection perms */
+                             0);          /* initial value */
+    if (semptr == (void *)-1)
+        die("sem_open");
+
     s = shm;
 
     for (c = 'a'; c <= 'z'; c++)
         *s++ = c;
+
+    if (sem_post(semptr) < 0)
+        die("sem_post");
 
     /*
      * Wait until the other process
@@ -45,10 +55,12 @@ void sendS()
     while (*shm != '*')
         sleep(1);
 
+    sem_close(semptr);
     exit(0);
 }
 
-void receiveS(){
+void receiveS()
+{
     int shmid;
     key_t key;
     char *shm, *s;
@@ -58,20 +70,27 @@ void receiveS(){
     if ((shmid = shmget(key, MAXSIZE, 0666)) < 0)
         die("shmget");
 
-    if ((shm = shmat(shmid, NULL, 0)) == (char *) -1)
+    if ((shm = shmat(shmid, NULL, 0)) == (char *)-1)
         die("shmat");
 
-    //Now read what the server put in the memory.
-    for (s = shm; *s != '\0'; s++)
-        putchar(*s);
-    putchar('\n');
+    /* create a semaphore for mutual exclusion */
+    sem_t *semptr = sem_open("semaphore", /* name */
+                             O_CREAT,     /* create the semaphore */
+                             0644,        /* protection perms */
+                             0);          /* initial value */
+    if (semptr == (void *)-1)
+        die("sem_open");
 
-    /*
-     *Change the first character of the
-     *segment to '*', indicating we have read
-     *the segment.
-     */
-    *shm = '*';
+    if (!sem_wait(semptr))
+    { /* wait until semaphore != 0 */
+        int i;
+        for (s = shm; *s != '\0'; s++)
+            putchar(*s);
+        putchar('\n');
+        *shm = '*';
+        sem_post(semptr);
+    }
+    sem_close(semptr);
 
     exit(0);
 }
