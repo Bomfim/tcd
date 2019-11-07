@@ -4,13 +4,15 @@
 
 int main()
 {
-    char alfabeto[] = "abcdefghijklmnopqrstuvwxyz";
+    char *res, *s;
+    res = receiveS();
 
-    receiveS(alfabeto);
-    // int status = receiveA(alfabeto);
 
-    // if (status == -1)
-    //     printf("%d\n", status);
+    //res = receiveA();
+
+    for (s = res; *s != '\0'; s++)
+        putchar(*s);
+    putchar('\n');
 
     return 0;
 }

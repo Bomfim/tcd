@@ -5,9 +5,10 @@
 int main()
 {
     char alfabeto[] = "abcdefghijklmnopqrstuvwxyz";
-    
+
     sendS(alfabeto);
-    // sendA(alfabeto);
+    
+    //sendA(alfabeto);
 
     return 0;
 }

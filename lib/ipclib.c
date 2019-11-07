@@ -35,6 +35,8 @@ void sendS(char c[])
 
     s = shm;
 
+    *s = '@';
+    s++;
     for (i = 0; c[i] != '\0'; i++)
         *s++ = c[i];
 
@@ -49,10 +51,9 @@ void sendS(char c[])
      */
     while (*shm != '*')
         sleep(1);
-
 }
 
-void receiveS(char c[])
+char *receiveS(char c[])
 {
     int shmid;
     key_t key;
@@ -76,20 +77,27 @@ void receiveS(char c[])
 
     if (!sem_wait(semptr))
     { /* wait until semaphore != 0 */
-        int i;
-        for (s = shm; *s != '\0'; s++)
-            putchar(*s);
-        putchar('\n');
+
+        /*
+        * Wait until the other process
+        * changes the first character of our memory
+        * to '@', indicating that it has write what
+        * we put there.
+        */
+        while (*shm != '@')
+            sleep(1);
+
         *shm = '*';
         sem_post(semptr);
+        sem_close(semptr);
+        return shm += 1;
     }
 
     //detach from shared memory
-    shmdt(shm);
+    // shmdt(shm);
 
     // destroy the shared memory
-    shmctl(shmid, IPC_RMID, NULL);
-    sem_close(semptr);
+    // shmctl(shmid, IPC_RMID, NULL);
 }
 
 void sendA(char c[])
@@ -115,6 +123,8 @@ void sendA(char c[])
 
     s = shm;
 
+    *s = '@';
+    s++;
     for (i = 0; c[i] != '\0'; i++)
         *s++ = c[i];
 
@@ -122,7 +132,7 @@ void sendA(char c[])
         die("sem_post");
 }
 
-int receiveA(char c[])
+char *receiveA(char c[])
 {
     int shmid;
     key_t key;
@@ -147,20 +157,11 @@ int receiveA(char c[])
     if (!sem_wait(semptr))
     { /* wait until semaphore != 0 */
         if (*shm == '*')
-            return -1;
+            return "-1";
 
-        int i;
-        for (s = shm; *s != '\0'; s++)
-            putchar(*s);
-        putchar('\n');
         *shm = '*';
         sem_post(semptr);
+        sem_close(semptr);
+        return shm+=1;
     }
-    
-    // detach from shared memory
-    // shmdt(shm);
-
-    // destroy the shared memory
-    // shmctl(shmid, IPC_RMID, NULL);
-    sem_close(semptr);
 }

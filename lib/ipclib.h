@@ -1,12 +1,12 @@
 #ifndef _IPCLIB_H_
 #define _IPCLIB_H_
 
-#define MAXSIZE 27
-#define KEY 9876
+#define MAXSIZE 28
+#define KEY 5678
 
 extern void sendS(char c[]);
-extern void receiveS(char c[]);
+extern char *receiveS();
 extern void sendA(char c[]);
-extern int receiveA(char c[]);
+extern char *receiveA();
 
 #endif
