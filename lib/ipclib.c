@@ -157,11 +157,15 @@ char *receiveA(char c[])
     if (!sem_wait(semptr))
     { /* wait until semaphore != 0 */
         if (*shm == '*')
+        {
+            sem_post(semptr);
+            sem_close(semptr);
             return "-1";
+        }
 
         *shm = '*';
         sem_post(semptr);
         sem_close(semptr);
-        return shm+=1;
+        return shm += 1;
     }
 }
