@@ -5,8 +5,8 @@
 int main()
 {
     char *res, *s;
+    
     res = receiveS();
-
 
     //res = receiveA();
 

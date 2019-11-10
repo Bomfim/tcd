@@ -3,6 +3,7 @@
         "types.h": "c",
         "ipc.h": "c",
         "ipclib.h": "c",
-        "stdbool.h": "c"
+        "stdbool.h": "c",
+        "stdio.h": "c"
     }
 }

@@ -10,7 +10,9 @@
                 "-g",
                 "${file}",
                 "-o",
-                "${fileDirname}/${fileBasenameNoExtension}"
+                "${fileDirname}/${fileBasenameNoExtension}",
+                "${fileDirname}/lib/ipclib.o",
+                "-lpthread"
             ],
             "options": {
                 "cwd": "/usr/bin"
@@ -27,7 +29,9 @@
             "args": [
                 "${file}",
                 "-o",
-                "${fileDirname}\\${fileBasenameNoExtension}.exe"
+                "${fileDirname}\\${fileBasenameNoExtension}.exe",
+                "lib/ipclib.o",
+                "-lpthread"
             ],
             "options": {
                 "cwd": "/usr/bin"
